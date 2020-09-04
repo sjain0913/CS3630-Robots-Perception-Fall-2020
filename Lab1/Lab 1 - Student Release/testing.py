@@ -18,11 +18,11 @@ import matplotlib.pyplot as plt
 # io.imshow(hog_image)
 # plt.show()
 
-image = io.imread('wall.bmp', as_gray=True)
+image = io.imread('wall0.bmp', as_gray=True)
 data = feature.canny(image, sigma=3)
 nonzero = np.argwhere(data == True)
 nonzero = np.flip(nonzero, axis=1)
-model_robust = measure.ransac(nonzero, measure.LineModelND, min_samples=2, residual_threshold=1)
+model_robust = measure.ransac(nonzero, measure.LineModelND, min_samples=2, residual_threshold=0.86)
 print(model_robust[0].params)
 slope = model_robust[0].params[1][1] / model_robust[0].params[1][0]
 intercept = model_robust[0].params[0][1] - (slope * model_robust[0].params[0][0])
@@ -34,3 +34,5 @@ print(intercept)
 
 # io.imshow(model_robust)
 # plt.show()
+
+#wall6,7

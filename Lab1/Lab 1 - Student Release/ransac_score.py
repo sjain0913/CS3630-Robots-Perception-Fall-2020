@@ -12,4 +12,6 @@ def score(slope, intercept):
         ic = intercept[i]
         if (slope_min[i] < s < slope_max[i]) and (int_min[i] < ic < int_max[i]):
             cnt+=1
+        else:
+            print(i)    
     return cnt

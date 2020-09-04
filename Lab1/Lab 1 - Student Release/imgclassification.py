@@ -59,8 +59,9 @@ class ImageClassifier:
             # io.imshow(hog_image)
             # plt.show()
 
+        feature_data = np.array(feature_data)
         # Please do not modify the return type below
-        return(np.array(feature_data))
+        return feature_data
 
     def train_classifier(self, train_data, train_labels):
         # Please do not modify the header above
@@ -97,8 +98,7 @@ class ImageClassifier:
             # 2. RANSAC: Run on output of edge detection
             required = np.argwhere(i == True)
             required = np.flip(required, axis=1)
-            model_robust = measure.ransac(required, measure.LineModelND, min_samples=2, residual_threshold=0.5)
-            print(model_robust[0].params)
+            model_robust = measure.ransac(required, measure.LineModelND, min_samples=2, residual_threshold=0.86)
             temp_slope = model_robust[0].params[1][1] / model_robust[0].params[1][0]
             temp_intercept = model_robust[0].params[0][1] - (temp_slope * model_robust[0].params[0][0])
 
