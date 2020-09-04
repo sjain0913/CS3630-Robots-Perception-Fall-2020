@@ -7,7 +7,7 @@
 import numpy as np
 import re
 from sklearn import svm, metrics
-from skimage import io, feature, filters, exposure, color
+from skimage import io, feature, filters, exposure, color, transform
 import ransac_score
 
 class ImageClassifier:
@@ -38,9 +38,22 @@ class ImageClassifier:
 
         # extract feature vector from image data
 
-        ########################
-        ######## YOUR CODE HERE
-        ########################
+        # 1. PREPROCESSING: grayscaling
+        data = color.rgb2gray(data)
+        # 1. PREPROCESSING: gaussian blur
+        data = filters.gaussian(data, sigma=(0.6,0.6))
+        # 1. PREPROCESSING: thresholding to get black and white (as displayed in pdf)
+        thresh = filters.threshold_minimum(data)
+        binary_image = data > thresh
+
+        # Couldn't resolve error related to putting a boolean image array inside hog, had to use image without thresholding
+        # 2. FEATURE DESCRIPTOR: HOG
+        (feature_data, hog_image) = feature.hog(data, orientations=8, pixels_per_cell=(32,32), cells_per_block=(2,2), visualize=True, multichannel=False)
+
+        # FOR TESTING PURPOSES ONLY
+        # print(H.size)
+        # io.imshow(hog_image)
+        # plt.show()
 
         # Please do not modify the return type below
         return(feature_data)
@@ -48,11 +61,11 @@ class ImageClassifier:
     def train_classifier(self, train_data, train_labels):
         # Please do not modify the header above
         
-        # train model and save the trained model to self.classifier
-        
-        ########################
-        ######## YOUR CODE HERE
-        ########################
+        model = svm.SVC()
+        model.fit(train_data, train_labels)
+
+        # Saving trained model to self.classifier
+        self.classifier = model
 
     def predict_labels(self, data):
         # Please do not modify the header
