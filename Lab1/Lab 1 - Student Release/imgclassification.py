@@ -61,21 +61,19 @@ class ImageClassifier:
     def train_classifier(self, train_data, train_labels):
         # Please do not modify the header above
         
-        model = svm.SVC()
-        model.fit(train_data, train_labels)
+        clf = svm.SVC()
+        clf.fit(train_data, train_labels)
 
         # Saving trained model to self.classifier
-        self.classifier = model
+        self.classifier = clf
 
     def predict_labels(self, data):
         # Please do not modify the header
 
         # predict labels of test data using trained model in self.classifier
         # the code below expects output to be stored in predicted_labels
-        
-        ########################
-        ######## YOUR CODE HERE
-        ########################
+
+        predicted_labels = self.classifier.predict(data)
 
         # Please do not modify the return type below
         return predicted_labels
@@ -86,9 +84,8 @@ class ImageClassifier:
         # fit a line the to arena wall using RANSAC
         # return two lists containing slopes and y intercepts of the line
 
-        ########################
-        ######## YOUR CODE HERE
-        ########################
+        slope = []
+        intercept = []
 
         # Please do not modify the return type below
         return slope, intercept
