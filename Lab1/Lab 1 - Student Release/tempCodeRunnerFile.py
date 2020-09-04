@@ -1,3 +1,2 @@
-
-# io.imshow(hog_image)
-# plt.show()
+print(slope)
+print(intercept)

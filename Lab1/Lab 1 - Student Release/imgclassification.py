@@ -7,7 +7,7 @@
 import numpy as np
 import re
 from sklearn import svm, metrics
-from skimage import io, feature, filters, exposure, color, transform
+from skimage import io, feature, filters, exposure, color, transform, measure
 import ransac_score
 
 class ImageClassifier:
@@ -37,26 +37,30 @@ class ImageClassifier:
         # Please do not modify the header above
 
         # extract feature vector from image data
+        
+        feature_data = []
 
-        # 1. PREPROCESSING: grayscaling
-        data = color.rgb2gray(data)
-        # 1. PREPROCESSING: gaussian blur
-        data = filters.gaussian(data, sigma=(0.6,0.6))
-        # 1. PREPROCESSING: thresholding to get black and white (as displayed in pdf)
-        thresh = filters.threshold_minimum(data)
-        binary_image = data > thresh
+        for i in data:
+            # 1. PREPROCESSING: grayscaling
+            i = color.rgb2gray(i)
+            # 1. PREPROCESSING: gaussian blur
+            i = filters.gaussian(i, sigma=(0.6,0.6))
+            # 1. PREPROCESSING: thresholding to get black and white (as displayed in pdf)
+            thresh = filters.threshold_minimum(i)
+            binary_image = i > thresh
 
-        # Couldn't resolve error related to putting a boolean image array inside hog, had to use image without thresholding
-        # 2. FEATURE DESCRIPTOR: HOG
-        (feature_data, hog_image) = feature.hog(data, orientations=8, pixels_per_cell=(32,32), cells_per_block=(2,2), visualize=True, multichannel=False)
-
-        # FOR TESTING PURPOSES ONLY
-        # print(H.size)
-        # io.imshow(hog_image)
-        # plt.show()
+            # Couldn't resolve error related to putting a boolean image array inside hog, had to use image without thresholding
+            # 2. FEATURE DESCRIPTOR: HOG
+            (feature_i, hog_image) = feature.hog(i, orientations=8, pixels_per_cell=(32,32), cells_per_block=(2,2), visualize=True, multichannel=False)
+            
+            feature_data.append(feature_i)
+            # FOR TESTING PURPOSES ONLY
+            # print(H.size)
+            # io.imshow(hog_image)
+            # plt.show()
 
         # Please do not modify the return type below
-        return(feature_data)
+        return(np.array(feature_data))
 
     def train_classifier(self, train_data, train_labels):
         # Please do not modify the header above
@@ -81,11 +85,25 @@ class ImageClassifier:
     def line_fitting(self, data):
         # Please do not modify the header
 
-        # fit a line the to arena wall using RANSAC
+        # fit a line to the arena wall using RANSAC
         # return two lists containing slopes and y intercepts of the line
-
         slope = []
         intercept = []
+        for i in data:
+            # 1. EDGE DETECTION: Using Canny on grayscale images
+            i = color.rgb2gray(i)
+            i = feature.canny(i, sigma=3)
+
+            # 2. RANSAC: Run on output of edge detection
+            required = np.argwhere(i == True)
+            required = np.flip(required, axis=1)
+            model_robust = measure.ransac(required, measure.LineModelND, min_samples=2, residual_threshold=1)
+            print(model_robust[0].params)
+            temp_slope = model_robust[0].params[1][1] / model_robust[0].params[1][0]
+            temp_intercept = model_robust[0].params[0][1] - (temp_slope * model_robust[0].params[0][0])
+
+            slope.append(temp_slope)
+            intercept.append(temp_intercept)
 
         # Please do not modify the return type below
         return slope, intercept
